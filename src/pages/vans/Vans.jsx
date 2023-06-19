@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import vans from "../vans.json";
+import vans from "../../vans.json";
 
 export default function Vans() {
   //   const [vans, setVans] = React.useState([]);

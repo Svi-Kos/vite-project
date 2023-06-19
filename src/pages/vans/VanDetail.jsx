@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import vans from "../vans.json";
+import vans from "../../vans.json";
 
 export default function VanDetail() {
   const params = useParams();
