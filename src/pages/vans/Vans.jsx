@@ -1,5 +1,10 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useLoaderData } from "react-router-dom";
 import vans from "../../vans.json";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function loader() {
+  return vans;
+}
 
 export default function Vans() {
   //   const [vans, setVans] = React.useState([]);
@@ -8,13 +13,14 @@ export default function Vans() {
   //       .then((res) => res.json())
   //       .then((data) => setVans(data.vans));
   //   }, []);
+  const loadedVans = useLoaderData();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
 
   const displayedVans = typeFilter
-    ? vans.filter((van) => van.type === typeFilter)
-    : vans;
+    ? loadedVans.filter((van) => van.type === typeFilter)
+    : loadedVans;
 
   const vanElements = displayedVans.map((van) => (
     <div key={van.id} className="van-tile">
