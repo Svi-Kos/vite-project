@@ -1,8 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import vans from "../../vans.json";
 
+export function loader() {
+  return vans;
+}
+
 export default function HostVans() {
-  const hostVans = vans.filter((van) => van.host === true);
+  const loadedVans = useLoaderData();
+  const hostVans = loadedVans.filter((van) => van.host === true);
 
   const hostVansEls = hostVans.map((van) => (
     <Link
@@ -24,11 +29,7 @@ export default function HostVans() {
     <section>
       <h1 className="host-vans-title">Your listed vans</h1>
       <div className="host-vans-list">
-        {vans.length > 0 ? (
-          <section>{hostVansEls}</section>
-        ) : (
-          <h2>Loading...</h2>
-        )}
+        <section>{hostVansEls}</section>
       </div>
     </section>
   );
