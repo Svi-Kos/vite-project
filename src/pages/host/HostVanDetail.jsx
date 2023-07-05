@@ -1,7 +1,10 @@
 import { Link, Outlet, NavLink, useLoaderData } from "react-router-dom";
 import vans from "../../vans.json";
+import { requireAuth } from "../../utils";
 
-export function loader({ params }) {
+// eslint-disable-next-line react-refresh/only-export-components
+export async function loader({ params, request }) {
+  await requireAuth(request);
   return vans.find((van) => van.id === params.id);
 }
 

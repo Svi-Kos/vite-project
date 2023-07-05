@@ -1,6 +1,15 @@
-import { Link, useSearchParams, useLoaderData } from "react-router-dom";
-import Form from "../components/Form.jsx";
+import {
+  Link,
+  useSearchParams,
+  useLoaderData,
+  Form,
+  redirect,
+  useActionData,
+  useNavigation,
+} from "react-router-dom";
+// import Form from "../components/Form.jsx";
 import { getNews } from "../api";
+import defaultImg from "../assets/images/2914476.jpg";
 
 export function loader({ request }) {
   const url = new URL(request.url);
@@ -9,16 +18,30 @@ export function loader({ request }) {
   return getNews(typeFilter ? typeFilter : "javascript");
 }
 
+export async function action({ request }) {
+  const formData = await request.formData();
+  const query = formData.get("search");
+
+  try {
+    await getNews(query);
+    return redirect(`/news?search=${query}`);
+  } catch (error) {
+    return error.message;
+  }
+}
+
 export default function News() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const typeFilter = searchParams.get("search");
 
   const loadedNews = useLoaderData();
+  const errorMsg = useActionData();
+  const navigation = useNavigation();
 
   const newsElements = loadedNews.map((article) => (
     <div key={article.publishedAt} className="van-tile">
       <Link to={`${article.url}`}>
-        <img src={article.urlToImage} />
+        <img src={article.urlToImage ? article.urlToImage : defaultImg} />
         <div className="van-info">
           <h3>{article.title}</h3>
         </div>
@@ -26,14 +49,17 @@ export default function News() {
     </div>
   ));
 
-  function showNewsByQuery(query) {
-    setSearchParams({ search: `${query}` });
-  }
-
   return (
     <div className="van-list-container">
       <h4>Enter search query to find news</h4>
-      <Form onSubmit={showNewsByQuery} />
+
+      <Form method="post">
+        <input type="text" name="search" />
+        <button type="submit" disabled={navigation.state === "submitting"}>
+          Search
+        </button>
+      </Form>
+      {errorMsg && <h3>An error occured: {errorMsg}</h3>}
       <h1>Last news about {typeFilter ? typeFilter : "javascript"}</h1>
       <div className="van-list">{newsElements}</div>
     </div>

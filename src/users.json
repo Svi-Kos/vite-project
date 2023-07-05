@@ -1,0 +1,29 @@
+[
+  {
+    "user": {
+      "id": "123",
+      "email": "b@b.com",
+      "password": "b123",
+      "name": "Bob"
+    },
+    "token": "Enjoy your pizza, here's your tokens."
+  },
+  {
+    "user": {
+      "id": "456",
+      "email": "r@r.com",
+      "password": "r123",
+      "name": "Ron"
+    },
+    "token": "Enjoy your pizza, here's your tokens."
+  },
+  {
+    "user": {
+      "id": "789",
+      "email": "s@s.com",
+      "password": "s123",
+      "name": "Sam"
+    },
+    "token": "Enjoy your pizza, here's your tokens."
+  }
+]
