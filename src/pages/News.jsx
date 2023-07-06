@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Link,
   useSearchParams,
@@ -6,6 +7,8 @@ import {
   redirect,
   useActionData,
   useNavigation,
+  defer,
+  Await,
 } from "react-router-dom";
 // import Form from "../components/Form.jsx";
 import { getNews } from "../api";
@@ -15,7 +18,7 @@ export function loader({ request }) {
   const url = new URL(request.url);
   const typeFilter = url.searchParams.get("search");
 
-  return getNews(typeFilter ? typeFilter : "javascript");
+  return defer({ news: getNews(typeFilter ? typeFilter : "javascript") });
 }
 
 export async function action({ request }) {
@@ -34,20 +37,30 @@ export default function News() {
   const [searchParams] = useSearchParams();
   const typeFilter = searchParams.get("search");
 
-  const loadedNews = useLoaderData();
+  const newsPromise = useLoaderData();
   const errorMsg = useActionData();
   const navigation = useNavigation();
 
-  const newsElements = loadedNews.map((article) => (
-    <div key={article.publishedAt} className="van-tile">
-      <Link to={`${article.url}`}>
-        <img src={article.urlToImage ? article.urlToImage : defaultImg} />
-        <div className="van-info">
-          <h3>{article.title}</h3>
-        </div>
-      </Link>
-    </div>
-  ));
+  function renderNewsElement(news) {
+    const newsElements = news.map((article) => (
+      <div key={article.publishedAt} className="van-tile">
+        <Link to={`${article.url}`}>
+          <img src={article.urlToImage ? article.urlToImage : defaultImg} />
+          <div className="van-info">
+            <h3>{article.title}</h3>
+          </div>
+        </Link>
+      </div>
+    ));
+
+    return (
+      <>
+        {errorMsg && <h3>an error occured: {errorMsg}</h3>}
+        <h1>Last news about {typeFilter ? typeFilter : "javascript"}</h1>
+        <div className="van-list">{newsElements}</div>
+      </>
+    );
+  }
 
   return (
     <div className="van-list-container">
@@ -59,9 +72,9 @@ export default function News() {
           Search
         </button>
       </Form>
-      {errorMsg && <h3>An error occured: {errorMsg}</h3>}
-      <h1>Last news about {typeFilter ? typeFilter : "javascript"}</h1>
-      <div className="van-list">{newsElements}</div>
+      <React.Suspense fallback={<h2>Loading news...</h2>}>
+        <Await resolve={newsPromise.news}>{renderNewsElement}</Await>
+      </React.Suspense>
     </div>
   );
 }
